@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trình tạo dữ liệu Portfolio</title>
+<style>
+  :root{
+    --bg:#0f1214;
+    --panel:#171b1e;
+    --panel-2:#1e2327;
+    --line:#2a2f33;
+    --line-soft:#22262a;
+    --text:#e8e6df;
+    --text-dim:#9a9d97;
+    --accent:#8fd6c1;
+    --accent-2:#e0b464;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.5;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+  header{margin-bottom:32px;}
+  header .tag{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--accent);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:8px;
+  }
+  h1{
+    font-size:26px;
+    font-weight:700;
+    margin:0 0 6px;
+    letter-spacing:-.01em;
+  }
+  header p{
+    color:var(--text-dim);
+    margin:0;
+    font-size:14px;
+    max-width:560px;
+  }
+  section.block{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:20px;
+    overflow:hidden;
+  }
+  .block-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    background:var(--panel-2);
+  }
+  .block-head h2{
+    font-size:15px;
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .block-head h2 .num{
+    font-family:var(--mono);
+    color:var(--accent);
+    font-size:12px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:2px 6px;
+  }
+  .block-body{padding:18px 20px;}
+  .entry{
+    border:1px solid var(--line-soft);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:14px;
+    position:relative;
+    background:rgba(255,255,255,0.015);
+  }
+  .entry:last-child{margin-bottom:0;}
+  .entry-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+  }
+  .entry-top .label{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:.05em;
+  }
+  .row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .row.single{grid-template-columns:1fr;}
+  .field label{
+    display:block;
+    font-size:12px;
+    color:var(--text-dim);
+    margin-bottom:5px;
+  }
+  input[type=text],textarea{
+    width:100%;
+    background:#12151710;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:9px 10px;
+    color:var(--text);
+    font-family:var(--sans);
+    font-size:13.5px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input[type=text]:focus,textarea:focus{
+    border-color:var(--accent);
+  }
+  textarea{resize:vertical;min-height:56px;}
+  .remove-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-size:11px;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-family:var(--mono);
+    transition:all .15s;
+  }
+  .remove-btn:hover{
+    border-color:#c9645f;
+    color:#c9645f;
+  }
+  .add-btn{
+    background:none;
+    border:1px dashed var(--line);
+    color:var(--accent);
+    font-size:13px;
+    padding:10px;
+    border-radius:6px;
+    cursor:pointer;
+    width:100%;
+    font-family:var(--sans);
+    margin-top:4px;
+    transition:all .15s;
+  }
+  .add-btn:hover{
+    border-color:var(--accent);
+    background:rgba(143,214,193,0.06);
+  }
+  .hint{
+    font-size:11px;
+    color:var(--text-dim);
+    margin-top:4px;
+  }
+  .actions{
+    display:flex;
+    gap:12px;
+    margin:28px 0 20px;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#0f1214;
+    border:none;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 22px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:var(--sans);
+  }
+  .btn-primary:hover{opacity:.9;}
+  .btn-secondary{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text);
+    font-size:14px;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:var(--sans);
+  }
+  .btn-secondary:hover{border-color:var(--text-dim);}
+  #output-section{display:none;}
+  #output-section.show{display:block;}
+  .output-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .output-head h2{font-size:15px;margin:0;}
+  #copy-btn{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--accent);
+    font-size:12px;
+    padding:7px 14px;
+    border-radius:6px;
+    cursor:pointer;
+    font-family:var(--mono);
+  }
+  #copy-btn:hover{border-color:var(--accent);}
+  pre#output{
+    background:#0b0d0e;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:#c8e6d9;
+    overflow-x:auto;
+    white-space:pre;
+    line-height:1.6;
+  }
+  .copied-msg{
+    color:var(--accent);
+    font-size:12px;
+    margin-left:10px;
+    font-family:var(--mono);
+    opacity:0;
+    transition:opacity .2s;
+  }
+  .copied-msg.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="tag">// data builder</span>
+    <h1>Trình tạo dữ liệu Portfolio</h1>
+    <p>Điền thông tin vào form bên dưới. Khi bấm "Xuất dữ liệu", hệ thống sẽ tự sinh ra đoạn mã theo đúng cấu trúc object (experience / projects / contact) để dán vào file nguồn.</p>
+  </header>
+
+  <section class="block" id="block-experience">
+    <div class="block-head">
+      <h2><span class="num">01</span>Kinh nghiệm làm việc</h2>
+    </div>
+    <div class="block-body" id="experience-list"></div>
+    <div class="block-body" style="padding-top:0;">
+      <button class="add-btn" onclick="addExperience()">+ Thêm kinh nghiệm</button>
+    </div>
+  </section>
+
+  <section class="block" id="block-projects">
+    <div class="block-head">
+      <h2><span class="num">02</span>Dự án</h2>
+    </div>
+    <div class="block-body" id="projects-list"></div>
+    <div class="block-body" style="padding-top:0;">
+      <button class="add-btn" onclick="addProject()">+ Thêm dự án</button>
+    </div>
+  </section>
+
+  <section class="block" id="block-contact">
+    <div class="block-head">
+      <h2><span class="num">03</span>Liên hệ</h2>
+    </div>
+    <div class="block-body" id="contact-list"></div>
+    <div class="block-body" style="padding-top:0;">
+      <button class="add-btn" onclick="addContact()">+ Thêm liên hệ</button>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn-primary" onclick="generateOutput()">Xuất dữ liệu</button>
+    <button class="btn-secondary" onclick="resetAll()">Xoá tất cả</button>
+  </div>
+
+  <section id="output-section">
+    <div class="output-head">
+      <h2>Kết quả</h2>
+      <span>
+        <button id="copy-btn" onclick="copyOutput()">Sao chép</button>
+        <span class="copied-msg" id="copied-msg">Đã sao chép</span>
+      </span>
+    </div>
+    <pre id="output"></pre>
+  </section>
+
+</div>
+
+<script>
+let expCount = 0;
+let projCount = 0;
+let contCount = 0;
+
+function addExperience(data){
+  expCount++;
+  const id = 'exp-' + expCount;
+  const d = data || {};
+  const div = document.createElement('div');
+  div.className = 'entry';
+  div.id = id;
+  div.innerHTML = `
+    <div class="entry-top">
+      <span class="label">Kinh nghiệm #${expCount}</span>
+      <button class="remove-btn" onclick="document.getElementById('${id}').remove()">Xoá</button>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Thời gian (period)</label>
+        <input type="text" class="f-period" placeholder="2024 — Hiện tại" value="${escAttr(d.period)}">
+      </div>
+      <div class="field">
+        <label>Chức danh (title)</label>
+        <input type="text" class="f-title" placeholder="Front-end Developer" value="${escAttr(d.title)}">
+      </div>
+    </div>
+    <div class="row single">
+      <div class="field">
+        <label>Đơn vị (org)</label>
+        <input type="text" class="f-org" placeholder="Công ty TNHH ..." value="${escAttr(d.org)}">
+      </div>
+    </div>
+    <div class="row single">
+      <div class="field">
+        <label>Mô tả (desc)</label>
+        <textarea class="f-desc" placeholder="Mô tả công việc, thành tựu...">${escHtml(d.desc)}</textarea>
+      </div>
+    </div>
+  `;
+  document.getElementById('experience-list').appendChild(div);
+}
+
+function addProject(data){
+  projCount++;
+  const id = 'proj-' + projCount;
+  const d = data || {};
+  const div = document.createElement('div');
+  div.className = 'entry';
+  div.id = id;
+  div.innerHTML = `
+    <div class="entry-top">
+      <span class="label">Dự án #${projCount}</span>
+      <button class="remove-btn" onclick="document.getElementById('${id}').remove()">Xoá</button>
+    </div>
+    <div class="row single">
+      <div class="field">
+        <label>Tên dự án (title)</label>
+        <input type="text" class="f-title" placeholder="EduConnect" value="${escAttr(d.title)}">
+      </div>
+    </div>
+    <div class="row single">
+      <div class="field">
+        <label>Mô tả (desc)</label>
+        <textarea class="f-desc" placeholder="Mô tả dự án...">${escHtml(d.desc)}</textarea>
+      </div>
+    </div>
+    <div class="row single">
+      <div class="field">
+        <label>Tags (cách nhau bằng dấu phẩy)</label>
+        <input type="text" class="f-tags" placeholder="React, TailwindCSS, Node.js" value="${escAttr((d.tags||[]).join(', '))}">
+        <div class="hint">Sẽ được tách thành mảng: ['React', 'TailwindCSS', 'Node.js']</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('projects-list').appendChild(div);
+}
+
+function addContact(data){
+  contCount++;
+  const id = 'cont-' + contCount;
+  const d = data || {};
+  const div = document.createElement('div');
+  div.className = 'entry';
+  div.id = id;
+  div.innerHTML = `
+    <div class="entry-top">
+      <span class="label">Liên hệ #${contCount}</span>
+      <button class="remove-btn" onclick="document.getElementById('${id}').remove()">Xoá</button>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Nhãn (label)</label>
+        <input type="text" class="f-label" placeholder="Email" value="${escAttr(d.label)}">
+      </div>
+      <div class="field">
+        <label>Icon</label>
+        <input type="text" class="f-icon" placeholder="@" value="${escAttr(d.icon)}">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Giá trị hiển thị (value)</label>
+        <input type="text" class="f-value" placeholder="khang.nguyen@example.com" value="${escAttr(d.value)}">
+      </div>
+      <div class="field">
+        <label>Liên kết (href)</label>
+        <input type="text" class="f-href" placeholder="mailto:... hoặc tel:..." value="${escAttr(d.href)}">
+      </div>
+    </div>
+  `;
+  document.getElementById('contact-list').appendChild(div);
+}
+
+function escAttr(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
+function escHtml(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+// escape for output inside single-quoted JS string literals
+function jsStr(s){
+  s = (s===undefined||s===null) ? '' : String(s);
+  return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+function generateOutput(){
+  const experiences = Array.from(document.querySelectorAll('#experience-list .entry')).map(el => ({
+    period: el.querySelector('.f-period').value,
+    title: el.querySelector('.f-title').value,
+    org: el.querySelector('.f-org').value,
+    desc: el.querySelector('.f-desc').value
+  }));
+
+  const projects = Array.from(document.querySelectorAll('#projects-list .entry')).map(el => ({
+    title: el.querySelector('.f-title').value,
+    desc: el.querySelector('.f-desc').value,
+    tags: el.querySelector('.f-tags').value.split(',').map(t => t.trim()).filter(Boolean)
+  }));
+
+  const contacts = Array.from(document.querySelectorAll('#contact-list .entry')).map(el => ({
+    label: el.querySelector('.f-label').value,
+    value: el.querySelector('.f-value').value,
+    icon: el.querySelector('.f-icon').value,
+    href: el.querySelector('.f-href').value
+  }));
+
+  let out = '';
+
+  out += '    experience: [\n';
+  experiences.forEach(e => {
+    out += '      {\n';
+    out += `        period: '${jsStr(e.period)}',\n`;
+    out += `        title: '${jsStr(e.title)}',\n`;
+    out += `        org: '${jsStr(e.org)}',\n`;
+    out += `        desc: '${jsStr(e.desc)}',\n`;
+    out += '      },\n';
+  });
+  out += '    ],\n\n\n\n    projects: [\n';
+  projects.forEach(p => {
+    out += '      {\n';
+    out += `        title: '${jsStr(p.title)}',\n`;
+    out += `        desc: '${jsStr(p.desc)}',\n`;
+    out += `        tags: [${p.tags.map(t => `'${jsStr(t)}'`).join(', ')}],\n`;
+    out += '      },\n';
+  });
+  out += '    ],\n\n\n\n\n\n    contact: [\n';
+  contacts.forEach(c => {
+    out += `      { label: '${jsStr(c.label)}', value: '${jsStr(c.value)}', icon: '${jsStr(c.icon)}', href: '${jsStr(c.href)}' },\n`;
+  });
+  out += '    ],';
+
+  document.getElementById('output').textContent = out;
+  document.getElementById('output-section').classList.add('show');
+  document.getElementById('output-section').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function copyOutput(){
+  const text = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('copied-msg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 1500);
+  });
+}
+
+function resetAll(){
+  if(!confirm('Xoá toàn bộ dữ liệu đã nhập?')) return;
+  document.getElementById('experience-list').innerHTML = '';
+  document.getElementById('projects-list').innerHTML = '';
+  document.getElementById('contact-list').innerHTML = '';
+  document.getElementById('output-section').classList.remove('show');
+  expCount = 0; projCount = 0; contCount = 0;
+  addExperience(); addProject(); addContact();
+}
+
+// seed with one example entry from the source template so the user sees the expected shape
+addExperience({period:'2024 — Hiện tại', title:'Front-end Developer', org:'Công ty TNHH Giải pháp Số Việt', desc:'Phát triển và tối ưu giao diện cho hệ thống quản trị nội bộ, phục vụ hơn 2.000 người dùng.'});
+addProject({title:'EduConnect', desc:'Nền tảng học trực tuyến kết nối giảng viên và sinh viên, hỗ trợ lớp học ảo.', tags:['React','Node.js','WebRTC']});
+addContact({label:'Email', value:'khang.nguyen@example.com', icon:'@', href:'mailto:khang.nguyen@example.com'});
+</script>
+</body>
+</html>
